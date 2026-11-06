@@ -42,7 +42,11 @@ class ToyEnv(gym.Env):
         self.iarlenv.render(*args, **kwargs)
 
     def reset(self):
-        self.iarlenv.reset()
+        obs = self.iarlenv.reset()
+        # reset() returns per-agent obs (n_agents, ...), step(ONLY_FOR_AGENT_0=True) doesn't.
+        # take agent 0, then latest scan only, to match step()'s observation shape.
+        obs = (obs[0][0][-1, :, 0], obs[1][0])
+        return obs
 
     def close(self):
         self.iarlenv.close()
